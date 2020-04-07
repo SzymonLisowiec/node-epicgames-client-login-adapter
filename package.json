@@ -1,0 +1,29 @@
+{
+	"name": "epicgames-client-login-adapter",
+	"version": "0.1.0",
+	"description": "Helper for epicgames-client library, to easy login.",
+	"main": "index.js",
+	"keywords": [
+		"epicgames",
+		"epicgames-client",
+		"login",
+    "exchange",
+    "captcha"
+	],
+	"homepage": "https://github.com/SzymonLisowiec/node-epicgames-client-login-adapter",
+	"bugs": {
+		"url": "https://github.com/SzymonLisowiec/node-epicgames-client-login-adapter/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/SzymonLisowiec/node-epicgames-client-login-adapter.git"
+	},
+	"author": {
+		"name": "Szymon Lisowiec",
+		"url": "https://kysune.me"
+	},
+	"license": "MIT",
+	"dependencies": {
+    "puppeteer": "^2.1.1"
+  }
+}
