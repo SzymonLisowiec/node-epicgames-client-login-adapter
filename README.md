@@ -13,23 +13,29 @@ npm i epicgames-client-login-adapter --save
 # Example
 ```javascript
 const { Launcher } = require('epicgames-client');
+const CREDENTIALS = {
+  login: 'E-MAIL_OR_USERNAME',
+  password: 'PASSWORD',
+};
 
 (async () => {
 
-  const launcher = new Launcher();
+  const launcher = new Launcher(CREDENTIALS);
 
   if(!await launcher.init()) {
     throw new Error('Error while initialize process.');
   }
   
-  const clientLoginAdapter = await ClientLoginAdapter.init({
-    login: 'E-MAIL_OR_USERNAME',
-    password: 'PASSWORD',
-  });
-  const exchangeCode = await clientLoginAdapter.getExchangeCode();
-  await clientLoginAdapter.close();
+  if(!await launcher.login()) {
+    const ClientLoginAdapter = require('epicgames-client-login-adapter');
+    const clientLoginAdapter = await ClientLoginAdapter.init(CREDENTIALS);
+    const exchangeCode = await clientLoginAdapter.getExchangeCode();
+    await clientLoginAdapter.close();
   
-  await launcher.login(null, exchangeCode);
+    if(!await launcher.login(null, exchangeCode)) {
+      throw new Error('Error while login process.');
+    }
+  }
   
   const playerName = 'Kysune';
   const account = await launcher.getProfile(playerName);
