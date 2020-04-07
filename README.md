@@ -4,8 +4,7 @@
 [![license](https://img.shields.io/npm/l/epicgames-client-login-adapter.svg)](https://github.com/SzymonLisowiec/node-epicgames-client-login-adapter/blob/master/LICENSE.MD)
 [![paypal](https://img.shields.io/badge/paypal-donate-orange.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=szymonlisowiec%40gmail.com&currency_code=USD&source=url)
 
-Helper for epicgames-client library, to easy login.
-
+![](https://github.com/SzymonLisowiec/node-epicgames-client-login-adapter/blob/master/assets/screenshot.png?raw=true)
 # Installation
 ```
 npm i epicgames-client-login-adapter --save
