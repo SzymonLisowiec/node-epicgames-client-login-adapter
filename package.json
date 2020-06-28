@@ -1,6 +1,6 @@
 {
 	"name": "epicgames-client-login-adapter",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"description": "Helper for epicgames-client library, to easy login.",
 	"main": "index.js",
 	"keywords": [
