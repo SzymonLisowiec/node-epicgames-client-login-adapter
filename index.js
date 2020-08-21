@@ -11,9 +11,13 @@ class EpicGamesClientLoginAdapter {
     return this.browser.close();
   }
 
+  async getPage() {
+    return await this.browser.pages().then(pages => pages[0]);
+  }
+
   async getExchangeCode () {
     try {
-      const page = await this.browser.pages().then(pages => pages[0]);
+      const page = await this.getPage();
 
       const oldXsrfToken = (await page.cookies()).find((c) => c.name === 'XSRF-TOKEN').value;
       page.once('request', (req) => {
@@ -80,6 +84,7 @@ class EpicGamesClientLoginAdapter {
       inputDelay: 100,
       enterCredentialsTimeout: 60000,
       puppeteer: {},
+      cookies: [],
       ...userOptions,
     };
     const browser = await Puppeteer.launch({
@@ -95,6 +100,10 @@ class EpicGamesClientLoginAdapter {
       ...options.puppeteer,
     });
     const page = await browser.pages().then(pages => pages[0]);
+    if (options.cookies && options.cookies.length) {
+      await page.setCookie(...options.cookies);
+    }
+
     await page.goto('https://epicgames.com/id');
     const login = credentials.login || credentials.email || credentials.username;
     if (login && credentials.password) {
