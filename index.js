@@ -1,5 +1,6 @@
 const Puppeteer = require('puppeteer');
 const { PendingXHR } = require('pending-xhr-puppeteer');
+const { ElementHandle } = require('puppeteer/lib/JSHandle');
 const ExchangeCodeException = require('./exceptions/ExchangeCodeException');
 
 class EpicGamesClientLoginAdapter {
@@ -85,6 +86,17 @@ class EpicGamesClientLoginAdapter {
     }
   }
 
+  static async waitForFirst(waiters, timeout, url) {
+    let errorTimeout = setTimeout(() => {
+      throw new ExchangeCodeException(`Something went wrong! Current page is ${url}`);
+    }, timeout);
+
+    let result = await Promise.race(waiters);
+    clearTimeout(errorTimeout);
+
+    return result;
+  }
+
   static async authenticate(credentials, page, options) {
     const login = credentials.login || credentials.email || credentials.username;
     if (login && credentials.password) {
@@ -98,9 +110,47 @@ class EpicGamesClientLoginAdapter {
       await loginButton.click();
     }
 
-    await page.waitForResponse(this.ACCOUNT_PAGE, {
-      timeout: options.enterCredentialsTimeout,
+    let account = page.waitForResponse(this.ACCOUNT_PAGE, {
+      timeout: options.enterCredentialsTimeout + 100,
     });
+
+    let captcha = page.waitForXPath('//iframe[@title="arkose-enforcement"]', {
+      timeout: options.enterCredentialsTimeout + 100
+    });
+
+    let result = await this.waitForFirst([captcha, account], options.enterCredentialsTimeout, page.url());
+    if (result instanceof ElementHandle) {
+      await this.handleCaptcha(await result.contentFrame(), page, options);
+    }
+  }
+
+  static async handleCaptcha(enforcementFrame, page, options) {
+    console.warn('You need to solve CAPTCHA!');
+
+    let frame = await (await enforcementFrame.waitForXPath('//iframe[@title="challenge frame"]')).contentFrame();
+    frame = await (await frame.waitForSelector('iframe')).contentFrame();
+    frame = await (await frame.waitForSelector('#CaptchaFrame')).contentFrame();
+
+    let timeout = 10000;
+    let button = frame.waitForSelector('#home_children_button', { visible: true }, { timeout: timeout + 100 });
+    let canvas = frame.waitForSelector('canvas', { visible: true }, { timeout: timeout + 100 });
+
+    let clickDelay = options.inputDelay + 20 * Math.random();
+    let element = await this.waitForFirst([button, canvas], timeout, frame.url());
+    if ((await element.evaluate(node => node.tagName)).toLowerCase() == 'canvas') {
+      const captchaBoundingBox = await element.boundingBox();
+
+      // Click on "Verify" button
+      await page.mouse.click(
+        captchaBoundingBox.x + captchaBoundingBox.width / 2.1 + 15 * Math.random(),
+        captchaBoundingBox.y + captchaBoundingBox.height * 3.2/4 + 15 * Math.random(),
+        { delay: clickDelay }
+      );
+    } else {
+      await element.click({ delay: clickDelay });
+    }
+
+    await page.waitForResponse(this.ACCOUNT_PAGE, { timeout: options.enterCredentialsTimeout });
   }
 
   static async init (credentials={}, userOptions={}) {
@@ -123,6 +173,7 @@ class EpicGamesClientLoginAdapter {
       args: [
         `--window-size=${options.width},${options.height}`,
         `--lang=${options.language}`,
+        '--disable-features=site-per-process'
       ],
       ...options.puppeteer,
     });
