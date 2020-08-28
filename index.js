@@ -1,4 +1,5 @@
 const Puppeteer = require('puppeteer');
+const { TimeoutError } = require('puppeteer/lib/Errors');
 const { PendingXHR } = require('pending-xhr-puppeteer');
 const { ElementHandle } = require('puppeteer/lib/JSHandle');
 const ExchangeCodeException = require('./exceptions/ExchangeCodeException');
@@ -87,12 +88,22 @@ class EpicGamesClientLoginAdapter {
   }
 
   static async waitForFirst(waiters, timeout, url) {
-    let errorTimeout = setTimeout(() => {
-      throw new ExchangeCodeException(`Something went wrong! Current page is ${url}`);
-    }, timeout);
+    let errorFunction = () => { throw new ExchangeCodeException(`Something went wrong! Current page is ${url}`); };
+    let errorTimeout = setTimeout(errorFunction, timeout);
 
-    let result = await Promise.race(waiters);
+    let result = await Promise.race(waiters).catch((error) => {
+      if (error instanceof TimeoutError) {
+        return error;
+      } else {
+        throw error;
+      }
+    });
+
     clearTimeout(errorTimeout);
+    if (result instanceof TimeoutError) {
+      console.error(result);
+      errorFunction();
+    }
 
     return result;
   }
