@@ -7,8 +7,8 @@
 		"epicgames",
 		"epicgames-client",
 		"login",
-    "exchange",
-    "captcha"
+		"exchange",
+		"captcha"
 	],
 	"homepage": "https://github.com/SzymonLisowiec/node-epicgames-client-login-adapter",
 	"bugs": {
@@ -24,6 +24,7 @@
 	},
 	"license": "MIT",
 	"dependencies": {
-    "puppeteer": "^2.1.1"
-  }
+		"pending-xhr-puppeteer": "^2.3.2",
+		"puppeteer": "^2.1.1"
+	}
 }
