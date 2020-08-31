@@ -22,6 +22,16 @@
 		"name": "Szymon Lisowiec",
 		"url": "https://kysune.me"
 	},
+    "contributors": [
+		{
+			"name": "Revadike",
+			"email": "revadike@outlook.com",
+			"url": "https://revadike.com"
+		},
+        {
+            "name": "davispuh"
+        }
+    ],
 	"license": "MIT",
 	"dependencies": {
 		"pending-xhr-puppeteer": "^2.3.2",
