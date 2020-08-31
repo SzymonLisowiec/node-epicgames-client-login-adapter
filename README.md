@@ -13,6 +13,7 @@ npm i epicgames-client-login-adapter --save
 # Example
 ```javascript
 const { Launcher } = require('epicgames-client');
+const ClientLoginAdapter = require('epicgames-client-login-adapter');
 
 (async () => {
 
