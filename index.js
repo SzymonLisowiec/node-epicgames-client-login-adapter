@@ -88,7 +88,7 @@ class EpicGamesClientLoginAdapter {
   }
 
   static async waitForFirst(waiters, timeout, url) {
-    let errorFunction = () => { throw new ExchangeCodeException(`Something went wrong! Current page is ${url}`); };
+    let errorFunction = () => { throw new ExchangeCodeException(`Something went wrong! Current page is ${url}. Details: ${result}`); };
     let errorTimeout = setTimeout(errorFunction, timeout);
 
     let result = await Promise.race(waiters).catch((error) => {
@@ -101,8 +101,7 @@ class EpicGamesClientLoginAdapter {
 
     clearTimeout(errorTimeout);
     if (result instanceof TimeoutError) {
-      console.error(result);
-      errorFunction();
+      errorFunction(result);
     }
 
     return result;
@@ -136,8 +135,6 @@ class EpicGamesClientLoginAdapter {
   }
 
   static async handleCaptcha(enforcementFrame, page, options) {
-    console.warn('You need to solve CAPTCHA!');
-
     let frame = await (await enforcementFrame.waitForXPath('//iframe[@title="challenge frame"]')).contentFrame();
     frame = await (await frame.waitForSelector('iframe')).contentFrame();
     frame = await (await frame.waitForSelector('#CaptchaFrame')).contentFrame();
