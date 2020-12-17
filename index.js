@@ -104,7 +104,7 @@ class EpicGamesClientLoginAdapter {
       await usernameOrEmailField.type(login, { delay: options.inputDelay });
       const passwordField = await page.waitForSelector('#password');
       await passwordField.type(credentials.password, { delay: options.inputDelay });
-      const loginButton = await page.waitForSelector('#login:not(:disabled)');
+      const loginButton = await page.waitForSelector('#sign-in:not(:disabled)');
       await loginButton.click();
     }
     await page.waitForResponse((response) => response.url() === 'https://www.epicgames.com/account/personal', {
